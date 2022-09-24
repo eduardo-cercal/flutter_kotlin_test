@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 
-class CustomRegisterField extends StatefulWidget {
+class CustomViewField extends StatefulWidget {
   final String title;
+  final String value;
 
-  const CustomRegisterField({Key? key, required this.title}) : super(key: key);
+  const CustomViewField({Key? key, required this.title, required this.value}) : super(key: key);
 
   @override
-  State<CustomRegisterField> createState() => _CustomRegisterFieldState();
+  State<CustomViewField> createState() => _CustomViewFieldState();
 }
 
-class _CustomRegisterFieldState extends State<CustomRegisterField> {
+class _CustomViewFieldState extends State<CustomViewField> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -17,14 +18,15 @@ class _CustomRegisterFieldState extends State<CustomRegisterField> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Text(
+          Text(
             widget.title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          TextField(
-            textInputAction: TextInputAction.next,
+          TextFormField(
+            enabled: false,
+            initialValue: widget.value,
             decoration: InputDecoration(
-              border: OutlineInputBorder(
+              disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: const BorderSide(color: Colors.grey),
               ),

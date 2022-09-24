@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const RegisterScreen()));
           },
-          icon: const Icon(Icons.add),
+          icon: const Icon(Icons.add,color: Colors.white,),
           iconSize: 40,
         ),
       ),
