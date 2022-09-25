@@ -1,20 +1,22 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:teste_flutter_kotlin/constants.dart';
+import 'package:teste_flutter_kotlin/helpers/constants.dart';
 
 class CustomCpfField extends StatelessWidget {
   final String title;
   final TextEditingController controller;
   final void Function(String value) stringFunction;
   final VoidCallback function;
+  final bool loading;
 
   const CustomCpfField(
       {Key? key,
       required this.title,
       required this.controller,
       required this.function,
-      required this.stringFunction})
+      required this.stringFunction,
+      required this.loading})
       : super(key: key);
 
   @override
@@ -34,7 +36,8 @@ class CustomCpfField extends StatelessWidget {
               SizedBox(
                 width: mediaData.width * 0.62,
                 child: TextField(
-                  onSubmitted: stringFunction,
+                  enabled: !loading,
+                  onSubmitted:  stringFunction,
                   controller: controller,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -65,19 +68,15 @@ class CustomCpfField extends StatelessWidget {
                     ),
                   ),
                 ),
-                onPressed: () => _existsRegister(controller.text),
-                child: const Icon(Icons.search),
+                onPressed: !loading ? function : null,
+                child: !loading
+                    ? const Icon(Icons.search)
+                    : const CircularProgressIndicator(),
               )
             ],
           )
         ],
       ),
     );
-  }
-
-  Future _existsRegister(String text) async {
-    final exits = await kotlinResources.invokeMethod("existRegister");
-
-    print(exits);
   }
 }

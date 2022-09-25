@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:teste_flutter_kotlin/Screen/home/components/custom_list_tile.dart';
 
-import '../../constants.dart';
+import '../../helpers/constants.dart';
 import '../register/register_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -35,7 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
           iconSize: 40,
         ),
       ),
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<List>(
           future: _getData(),
           builder: (context, snapshot) => snapshot.hasData
               ? ListView.builder(
@@ -47,10 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         title: Text(
                           item["name"],
                           style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        subtitle: Text(
-                          !item["expanded"] ? "Expandir" : "Retrair",
-                          style: const TextStyle(color: Colors.grey),
                         ),
                         children: [
                           CustomListTile(
@@ -65,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               text: item["district"], icon: Icons.map_outlined),
                         ],
                         onExpansionChanged: (expanded) => setState(() {
-                          item["expanded"] = expanded;
+
                         }),
                       ),
                     );
@@ -74,40 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _getData() async {
+  Future<List> _getData() async {
     try {
-      final list = await kotlinResources.invokeMethod("getList");
+      final List list = await kotlinResources.invokeMethod("getList");
 
-      print(list);
-
-      return [
-        {
-          "name": "Eduardo",
-          "cpf": "093.671.659-27",
-          "cep": "81.730-010",
-          "address": "Rua Anne Frank",
-          "district": "boqueirão",
-          "expanded": false
-        },
-        {
-          "name": "Ana",
-          "cpf": "093.671.659-27",
-          "cep": "81.730-010",
-          "address": "Rua Anne Frank",
-          "district": "boqueirão",
-          "expanded": false
-        },
-        {
-          "name": "Bruno",
-          "cpf": "093.671.659-27",
-          "cep": "81.730-010",
-          "address": "Rua Anne Frank",
-          "district": "boqueirão",
-          "expanded": false
-        }
-      ];
+      return list;
     } catch (e) {
-      print(e);
       return [];
     }
   }

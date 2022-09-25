@@ -1,7 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:teste_flutter_kotlin/Screen/register/components/custom_register_field.dart';
-import 'package:teste_flutter_kotlin/constants.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:teste_flutter_kotlin/Screen/home/home_screen.dart';
+import 'package:teste_flutter_kotlin/Screen/register/components/custom_register_field.dart';
+import 'package:teste_flutter_kotlin/helpers/constants.dart';
+import 'package:http/http.dart' as http;
 import 'components/custom_cep_field.dart';
 import 'components/custom_cpf_field.dart';
 import 'components/custom_view_field.dart';
@@ -19,6 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController cep = TextEditingController();
   final TextEditingController district = TextEditingController();
   final TextEditingController address = TextEditingController();
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +49,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 CustomCpfField(
                   title: "CPF*",
                   controller: cpf,
-                  function: () async => await _existsRegister(cpf.text),
+                  function: () async =>
+                      await _existsRegister(cpf.text, context),
                   stringFunction: (String value) async =>
-                      await _existsRegister(value),
+                      await _existsRegister(value, context),
+                  loading: loading,
                 ),
                 CustomRegisterField(
                   title: "Nome*",
                   controller: name,
+                  loading: loading,
                 ),
                 CustomCepField(
                   title: "CEP*",
                   controller: cep,
-                  function: () {},
+                  function: _getCep,
+                  stringFunction: (String value) async => _getCep(),
+                  loading: loading,
                 ),
                 CustomViewField(
                   title: "Bairro",
@@ -81,10 +90,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Size(mediaData.width, mediaData.height * 0.07),
                       ),
                     ),
-                    onPressed: () async {
-                      kotlinResources.invokeMethod("insertRegister");
-                      Navigator.of(context).pop();
-                    },
+                    onPressed: _isValid()
+                        ? () async {
+                            await _insertRegister();
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const HomeScreen()));
+                          }
+                        : null,
                     child: const Text("Registrar"),
                   ),
                 )
@@ -115,9 +128,77 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ],
       );
 
-  Future _existsRegister(String text) async {
-    final exits = await kotlinResources.invokeMethod("existRegister");
+  Future _existsRegister(String text, BuildContext context) async {
+    setState(() => loading = true);
 
-    print(exits);
+    final exists =
+        await kotlinResources.invokeMethod("existRegister", {"cpf": text});
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: exists["id"] == 0 ? Colors.blue : Colors.red,
+        duration: const Duration(seconds: 2),
+        content: Text(
+            exists["id"] == 0
+                ? "Sem registro para esse cpf"
+                : "Cpf no registro de ${exists["name"]}",
+            textAlign: TextAlign.center),
+      ),
+    );
+    setState(() {
+      if (exists["id"] != 0) {
+        cpf.clear();
+      }
+      loading = false;
+    });
+  }
+
+  Future<void> _getCep() async {
+    setState(() => loading = true);
+    final clearCep = cep.text.replaceAll(RegExp('[.-]'), "");
+
+    final response =
+        await http.get(Uri.parse("http://viacep.com.br/ws/$clearCep/json/"));
+    final result = jsonDecode(response.body);
+
+    if(result["erro"]!=null){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+          content: Text(
+              "CEP não existe",
+              textAlign: TextAlign.center),
+        ),
+      );
+    }
+
+    setState(() {
+      if (result["erro"] == null) {
+        district.text = result["bairro"];
+        address.text = result["logradouro"];
+      }
+      loading = false;
+    });
+  }
+
+  Future<void> _insertRegister() async {
+    final Map<String, dynamic> map = {
+      "name": name.text,
+      "cpf": cpf.text,
+      "cep": cep.text,
+      "district": district.text,
+      "address": address.text
+    };
+
+    await kotlinResources.invokeMethod("insertRegister", map);
+  }
+
+  bool _isValid() {
+    return name.text.isNotEmpty &&
+        cpf.text.isNotEmpty &&
+        cep.text.isNotEmpty &&
+        district.text.isNotEmpty &&
+        address.text.isNotEmpty;
   }
 }

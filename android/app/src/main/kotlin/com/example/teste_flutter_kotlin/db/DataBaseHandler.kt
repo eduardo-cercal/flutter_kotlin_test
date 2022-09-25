@@ -25,6 +25,10 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DB_NAME, nul
         val db = this.writableDatabase
         val values = ContentValues()
         values.put(NAME, register.name)
+        values.put(CPF, register.cpf)
+        values.put(CEP, register.cep)
+        values.put(DISTRICT, register.district)
+        values.put(ADDRESS, register.address)
         val _success = db.insert(TABLE_NAME, null, values)
         return (("$_success").toInt() != -1)
     }
@@ -34,9 +38,10 @@ class DataBaseHandler(context: Context) : SQLiteOpenHelper(context, DB_NAME, nul
         val db = writableDatabase
         val selectQuery = "select * from $TABLE_NAME where $CPF = '$_cpf'"
         val cursor = db.rawQuery(selectQuery, null)
-        cursor?.moveToFirst()
-        register.id = cursor.getInt(cursor.getColumnIndexOrThrow(ID))
-        register.name = cursor.getString(cursor.getColumnIndexOrThrow(NAME))
+        if (cursor.moveToFirst()) {
+            register.id = cursor.getInt(cursor.getColumnIndexOrThrow(ID))
+            register.name = cursor.getString(cursor.getColumnIndexOrThrow(NAME))
+        }
         cursor.close()
 
         return register

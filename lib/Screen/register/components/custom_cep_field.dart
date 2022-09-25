@@ -6,8 +6,16 @@ class CustomCepField extends StatefulWidget {
   final String title;
   final TextEditingController controller;
   final VoidCallback function;
+  final void Function(String value) stringFunction;
+  final bool loading;
 
-  const CustomCepField({Key? key, required this.title, required this.controller, required this.function})
+  const CustomCepField(
+      {Key? key,
+      required this.title,
+      required this.controller,
+      required this.function,
+      required this.stringFunction,
+      required this.loading})
       : super(key: key);
 
   @override
@@ -32,7 +40,8 @@ class _CustomCepFieldState extends State<CustomCepField> {
               SizedBox(
                 width: mediaData.width * 0.3,
                 child: TextField(
-                  onEditingComplete: widget.function,
+                  enabled: !widget.loading,
+                  onSubmitted: widget.stringFunction,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
@@ -62,8 +71,10 @@ class _CustomCepFieldState extends State<CustomCepField> {
                     ),
                   ),
                 ),
-                onPressed: widget.function,
-                child: const Icon(Icons.search),
+                onPressed: !widget.loading ? widget.function : null,
+                child: !widget.loading
+                    ? const Icon(Icons.search)
+                    : const CircularProgressIndicator(),
               )
             ],
           )
