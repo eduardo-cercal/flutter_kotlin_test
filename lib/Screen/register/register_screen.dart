@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:teste_flutter_kotlin/Screen/register/components/custom_register_field.dart';
+import 'package:teste_flutter_kotlin/constants.dart';
 
 import 'components/custom_cep_field.dart';
 import 'components/custom_cpf_field.dart';
@@ -13,6 +14,12 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final TextEditingController cpf = TextEditingController();
+  final TextEditingController name = TextEditingController();
+  final TextEditingController cep = TextEditingController();
+  final TextEditingController district = TextEditingController();
+  final TextEditingController address = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final mediaData = MediaQuery.of(context).size;
@@ -35,19 +42,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
             margin: EdgeInsets.all(mediaData.longestSide * 0.03),
             child: Column(
               children: [
-                const CustomCpfField(title: "CPF*"),
-                const CustomRegisterField(title: "Nome*"),
-                const CustomCepField(
+                CustomCpfField(
+                  title: "CPF*",
+                  controller: cpf,
+                  function: () async => await _existsRegister(cpf.text),
+                  stringFunction: (String value) async =>
+                      await _existsRegister(value),
+                ),
+                CustomRegisterField(
+                  title: "Nome*",
+                  controller: name,
+                ),
+                CustomCepField(
                   title: "CEP*",
-                  value: '',
+                  controller: cep,
+                  function: () {},
                 ),
-                const CustomViewField(
+                CustomViewField(
                   title: "Bairro",
-                  value: '',
+                  controller: district,
                 ),
-                const CustomViewField(
+                CustomViewField(
                   title: "Endereço",
-                  value: '',
+                  controller: address,
                 ),
                 SizedBox(height: mediaData.height * 0.01),
                 Padding(
@@ -64,7 +81,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             Size(mediaData.width, mediaData.height * 0.07),
                       ),
                     ),
-                    onPressed: () async{
+                    onPressed: () async {
+                      kotlinResources.invokeMethod("insertRegister");
                       Navigator.of(context).pop();
                     },
                     child: const Text("Registrar"),
@@ -96,4 +114,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
               )),
         ],
       );
+
+  Future _existsRegister(String text) async {
+    final exits = await kotlinResources.invokeMethod("existRegister");
+
+    print(exits);
+  }
 }

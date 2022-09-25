@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomViewField extends StatefulWidget {
   final String title;
-  final String value;
+  final TextEditingController controller;
 
-  const CustomViewField({Key? key, required this.title, required this.value}) : super(key: key);
+  const CustomViewField({Key? key, required this.title, required this.controller}) : super(key: key);
 
   @override
   State<CustomViewField> createState() => _CustomViewFieldState();
@@ -22,9 +22,9 @@ class _CustomViewFieldState extends State<CustomViewField> {
             widget.title,
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          TextFormField(
+          TextField(
             enabled: false,
-            initialValue: widget.value,
+            controller: widget.controller,
             decoration: InputDecoration(
               disabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),

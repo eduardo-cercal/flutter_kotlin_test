@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:teste_flutter_kotlin/Screen/home/components/custom_list_tile.dart';
 
+import '../../constants.dart';
 import '../register/register_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,7 +28,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => const RegisterScreen()));
           },
-          icon: const Icon(Icons.add,color: Colors.white,),
+          icon: const Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
           iconSize: 40,
         ),
       ),
@@ -70,32 +75,40 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List<Map<String, dynamic>>> _getData() async {
-    await Future.delayed(const Duration(seconds: 10));
-    return [
-      {
-        "name": "Eduardo",
-        "cpf": "093.671.659-27",
-        "cep": "81.730-010",
-        "address": "Rua Anne Frank",
-        "district": "boqueirão",
-        "expanded": false
-      },
-      {
-        "name": "Ana",
-        "cpf": "093.671.659-27",
-        "cep": "81.730-010",
-        "address": "Rua Anne Frank",
-        "district": "boqueirão",
-        "expanded": false
-      },
-      {
-        "name": "Bruno",
-        "cpf": "093.671.659-27",
-        "cep": "81.730-010",
-        "address": "Rua Anne Frank",
-        "district": "boqueirão",
-        "expanded": false
-      }
-    ];
+    try {
+      final list = await kotlinResources.invokeMethod("getList");
+
+      print(list);
+
+      return [
+        {
+          "name": "Eduardo",
+          "cpf": "093.671.659-27",
+          "cep": "81.730-010",
+          "address": "Rua Anne Frank",
+          "district": "boqueirão",
+          "expanded": false
+        },
+        {
+          "name": "Ana",
+          "cpf": "093.671.659-27",
+          "cep": "81.730-010",
+          "address": "Rua Anne Frank",
+          "district": "boqueirão",
+          "expanded": false
+        },
+        {
+          "name": "Bruno",
+          "cpf": "093.671.659-27",
+          "cep": "81.730-010",
+          "address": "Rua Anne Frank",
+          "district": "boqueirão",
+          "expanded": false
+        }
+      ];
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 }

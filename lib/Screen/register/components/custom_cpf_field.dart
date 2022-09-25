@@ -1,11 +1,21 @@
 import 'package:brasil_fields/brasil_fields.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:teste_flutter_kotlin/constants.dart';
 
 class CustomCpfField extends StatelessWidget {
   final String title;
+  final TextEditingController controller;
+  final void Function(String value) stringFunction;
+  final VoidCallback function;
 
-  const CustomCpfField({Key? key, required this.title}) : super(key: key);
+  const CustomCpfField(
+      {Key? key,
+      required this.title,
+      required this.controller,
+      required this.function,
+      required this.stringFunction})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,8 +32,10 @@ class CustomCpfField extends StatelessWidget {
           Row(
             children: [
               SizedBox(
-                width: mediaData.width * 0.625,
+                width: mediaData.width * 0.62,
                 child: TextField(
+                  onSubmitted: stringFunction,
+                  controller: controller,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     CpfInputFormatter()
@@ -44,16 +56,16 @@ class CustomCpfField extends StatelessWidget {
               ElevatedButton(
                 style: ButtonStyle(
                   fixedSize: MaterialStateProperty.resolveWith(
-                        (states) =>
+                    (states) =>
                         Size(mediaData.width * 0.13, mediaData.height * 0.07),
                   ),
                   shape: MaterialStateProperty.resolveWith(
-                        (states) => RoundedRectangleBorder(
+                    (states) => RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: () => _existsRegister(controller.text),
                 child: const Icon(Icons.search),
               )
             ],
@@ -61,5 +73,11 @@ class CustomCpfField extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future _existsRegister(String text) async {
+    final exits = await kotlinResources.invokeMethod("existRegister");
+
+    print(exits);
   }
 }

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class CustomRegisterField extends StatefulWidget {
   final String title;
+  final TextEditingController controller;
 
-  const CustomRegisterField({Key? key, required this.title}) : super(key: key);
+  const CustomRegisterField({Key? key, required this.title, required this.controller}) : super(key: key);
 
   @override
   State<CustomRegisterField> createState() => _CustomRegisterFieldState();
@@ -22,6 +23,7 @@ class _CustomRegisterFieldState extends State<CustomRegisterField> {
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           TextField(
+            controller: widget.controller,
             textInputAction: TextInputAction.next,
             decoration: InputDecoration(
               border: OutlineInputBorder(

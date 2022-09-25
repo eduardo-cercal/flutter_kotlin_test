@@ -4,9 +4,10 @@ import 'package:flutter/services.dart';
 
 class CustomCepField extends StatefulWidget {
   final String title;
-  final String value;
+  final TextEditingController controller;
+  final VoidCallback function;
 
-  const CustomCepField({Key? key, required this.title, required this.value})
+  const CustomCepField({Key? key, required this.title, required this.controller, required this.function})
       : super(key: key);
 
   @override
@@ -30,13 +31,14 @@ class _CustomCepFieldState extends State<CustomCepField> {
             children: [
               SizedBox(
                 width: mediaData.width * 0.3,
-                child: TextFormField(
+                child: TextField(
+                  onEditingComplete: widget.function,
                   keyboardType: TextInputType.number,
                   inputFormatters: [
                     FilteringTextInputFormatter.digitsOnly,
                     CepInputFormatter()
                   ],
-                  initialValue: widget.value,
+                  controller: widget.controller,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -60,7 +62,7 @@ class _CustomCepFieldState extends State<CustomCepField> {
                     ),
                   ),
                 ),
-                onPressed: () {},
+                onPressed: widget.function,
                 child: const Icon(Icons.search),
               )
             ],
